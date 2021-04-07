@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+  <color name="primary">#fcfdfd</color>
+  <color name="primary_dark">#dddde1</color>
+  <color name="colorPrimary" tools:keep="@color/colorPrimary">@color/white</color>
+  <color name="colorPrimaryDark" tools:keep="@color/colorPrimaryDark">@color/grey_trans</color>
+  <color name="primary_light" tools:keep="@color/primary_light">#C5CAE9</color>
+  <color name="accent">#d4961b</color>
+  <color name="icons">#3F51B5</color>
+  <color name="divider">#BDBDBD</color>
+
+  <!--shimmer-->
+  <color name="demo_light_transparent" tools:keep="@color/demo_light_transparent">#16000000</color>
+  <color name="demo_dark_transparent" tools:keep="@color/demo_dark_transparent">#24000000</color>
+
+
+
+  <color name="black">#000000</color>
+
+  <color name="black_25_transparent">#40000000</color>
+
+  <color name="transparent" tools:keep="@color/transparent">#00000000</color>
+
+
+  <color name="grey_trans" tools:keep="@color/grey_trans">#c7c7c7</color>
+
+
+  <color name="green" tools:keep="@color/green">#70c050</color>
+
+  <color name="yellow" tools:keep="@color/yellow">#F6A623</color>
+
+  <color name="violet" tools:keep="@color/violet">#673AB7</color>
+  <color name="violet_trans_80" tools:keep="@color/violet_trans_80">#BF673AB7</color>
+
+
+  <color name="orange" tools:keep="@color/orange">#F07B3F</color>
+
+  <color name="grey" tools:keep="@color/grey">#949494</color>
+  <color name="red" tools:keep="@color/red">#FE3824</color>
+  <color name="red_logout" tools:keep="@color/red_logout">#E95354</color>
+
+  <color name="white" tools:keep="@color/white">#FFFFFF</color>
+  <color name="white_transparent_80" tools:keep="@color/white_transparent_80">#BFFFFFFF</color>
+
+  <color name="primary_text" tools:keep="@color/primary_text">#212121</color>
+  <color name="secondary_text" tools:keep="@color/secondary_text">#727272</color>
+  <color name="chrome_grey">#F2F2F2</color>
+  <color name="txt_profile" tools:keep="@color/txt_profile">#2C4058</color>
+</resources>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:elevation="0dp"
+    android:layout_height="?attr/actionBarSize"
+    android:background="?attr/colorPrimary"
+    app:layout_scrollFlags="scroll|enterAlways"
+    app:popupTheme="@style/Theme.AppCompat.Light"
+    app:titleTextColor="@color/black"
+    tools:targetApi="lollipop">
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search_toolbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:visibility="gone"
+        app:closeIcon="@drawable/ic_close_white_24dp"
+        app:queryHint="Search"
+        app:searchHintIcon="@null"
+        app:searchIcon="@drawable/ic_search_white_24dp">
+
+    </androidx.appcompat.widget.SearchView>
+
+</androidx.appcompat.widget.Toolbar>

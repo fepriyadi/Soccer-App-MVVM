@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin" tools:keep="@dimen/activity_vertical_margin">16dp</dimen>
+    <dimen name="nav_header_vertical_spacing" tools:keep="@dimen/nav_header_vertical_spacing">16dp</dimen>
+    <dimen name="nav_header_height" tools:keep="@dimen/nav_header_height">160dp</dimen>
+    <dimen name="fab_margin" tools:keep="@dimen/fab_margin">16dp</dimen>
+    <dimen name="search_view_inset" tools:keep="@dimen/search_view_inset">4dp</dimen>
+
+</resources>
