@@ -2,116 +2,128 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_view"
     android:clickable="true"
-    android:background="?attr/selectableItemBackgroundBorderless"
+    android:layout_gravity="fill"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center"
+    android:layout_marginTop="4dp"
     android:layout_marginLeft="8dp"
     android:elevation="1dp"
-    android:layout_marginTop="4dp"
     android:layout_marginRight="8dp"
     android:layout_marginBottom="4dp"
     card_view:cardCornerRadius="4dp"
-    tools:targetApi="lollipop"
+    android:foreground="?android:attr/selectableItemBackground"
     android:focusable="true">
 
-    <LinearLayout
+
+    <!--    <LinearLayout-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:orientation="vertical"-->
+    <!--        android:padding="8dp">-->
+
+    <!--            <LinearLayout-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginTop="10dp"-->
+    <!--                android:layout_marginBottom="10dp"-->
+    <!--                android:orientation="horizontal">-->
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="8dp">
+        android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/img_banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:contentDescription="TODO" />
 
-                <TextView
-                    android:id="@+id/adding"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content" />
+    </RelativeLayout>
+    <!--                <TextView-->
+    <!--                    android:id="@+id/adding"-->
+    <!--                    android:layout_width="0dp"-->
+    <!--                    android:layout_weight="1"-->
+    <!--                    android:layout_height="wrap_content" />-->
 
-                <TextView
-                    android:id="@+id/event_time"
-                    android:layout_width="0dp"
-                    android:layout_weight="9"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:gravity="center_horizontal"
-                    android:textColor="@color/icons" />
+    <!--                <TextView-->
+    <!--                    android:id="@+id/event_time"-->
+    <!--                    android:layout_width="0dp"-->
+    <!--                    android:layout_weight="9"-->
+    <!--                    android:layout_height="match_parent"-->
+    <!--                    android:layout_gravity="center"-->
+    <!--                    android:gravity="center_horizontal"-->
+    <!--                    android:textColor="@color/icons" />-->
 
-                <ImageView
-                    android:id="@+id/img_add_to_calender"
-                    android:layout_weight="1"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    tools:targetApi="lollipop" />
-                <!--                    card_view:srcCompat="@drawable/notif_bell"-->
+    <!--                <ImageView-->
+    <!--                    android:id="@+id/img_add_to_calender"-->
+    <!--                    android:layout_weight="1"-->
+    <!--                    android:background="?attr/selectableItemBackgroundBorderless"-->
+    <!--                    android:layout_width="0dp"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:layout_gravity="end"-->
+    <!--                    tools:targetApi="lollipop" />-->
+    <!--                &lt;!&ndash;                    card_view:srcCompat="@drawable/notif_bell"&ndash;&gt;-->
 
-            </LinearLayout>
+    <!--            </LinearLayout>-->
 
-            <TextView
-                android:id="@+id/tv_time_match"
-                android:layout_gravity="center"
-                android:textColor="@color/icons"
-                android:layout_width="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_height="wrap_content" />
+    <!--            <TextView-->
+    <!--                android:id="@+id/tv_time_match"-->
+    <!--                android:layout_gravity="center"-->
+    <!--                android:textColor="@color/icons"-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_marginBottom="10dp"-->
+    <!--                android:layout_height="wrap_content" />-->
 
-            <LinearLayout
-                android:id="@+id/item_event"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp">
+    <!--            <LinearLayout-->
+    <!--                android:id="@+id/item_event"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginBottom="10dp">-->
 
-                <TextView
-                    android:id="@+id/first_team_name"
-                    android:layout_width="0dp"
-                    android:ellipsize="marquee"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:textAlignment="center" />
+    <!--                <TextView-->
+    <!--                    android:id="@+id/first_team_name"-->
+    <!--                    android:layout_width="0dp"-->
+    <!--                    android:ellipsize="marquee"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:layout_weight="2"-->
+    <!--                    android:textAlignment="center" />-->
 
-                <TextView
-                    android:id="@+id/first_team_score"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textAlignment="center"
-                    android:textStyle="bold" />
+    <!--                <TextView-->
+    <!--                    android:id="@+id/first_team_score"-->
+    <!--                    android:layout_width="0dp"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:layout_weight="1"-->
+    <!--                    android:textAlignment="center"-->
+    <!--                    android:textStyle="bold" />-->
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:text="vs"
-                    android:textAlignment="center" />
+    <!--                <TextView-->
+    <!--                    android:layout_width="0dp"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:layout_weight="0.5"-->
+    <!--                    android:text="vs"-->
+    <!--                    android:textAlignment="center" />-->
 
-                <TextView
-                    android:id="@+id/second_team_score"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textAlignment="center"
-                    android:textStyle="bold" />
+    <!--                <TextView-->
+    <!--                    android:id="@+id/second_team_score"-->
+    <!--                    android:layout_width="0dp"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:layout_weight="1"-->
+    <!--                    android:textAlignment="center"-->
+    <!--                    android:textStyle="bold" />-->
 
-                <TextView
-                    android:id="@+id/second_team_name"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:textAlignment="center" />
+    <!--                <TextView-->
+    <!--                    android:id="@+id/second_team_name"-->
+    <!--                    android:layout_width="0dp"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:layout_weight="2"-->
+    <!--                    android:textAlignment="center" />-->
 
-            </LinearLayout>
+    <!--            </LinearLayout>-->
 
-        </LinearLayout>
+    <!--        </LinearLayout>-->
 
 </androidx.cardview.widget.CardView>

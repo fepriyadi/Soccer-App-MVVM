@@ -8,15 +8,15 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <Spinner
-            android:id="@+id/league_spinner"
-            android:layout_width="match_parent"
-            android:spinnerMode="dialog"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin">
+        <!--        <Spinner-->
+        <!--            android:id="@+id/league_spinner"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:spinnerMode="dialog"-->
+        <!--            android:layout_marginStart="@dimen/activity_horizontal_margin"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginEnd="@dimen/activity_horizontal_margin">-->
 
-        </Spinner>
+        <!--        </Spinner>-->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_prev_match"

@@ -40,7 +40,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:textColor="@color/icons"
-                    android:textSize="17pt" />
+                    android:textSize="12pt" />
 
             </LinearLayout>
 
@@ -62,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:textColor="@color/icons"
-                    android:textSize="17pt" />
+                    android:textSize="12pt" />
 
             </LinearLayout>
 

@@ -3,13 +3,14 @@ package id.android.soccerapp.ui.adapter
 import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.fragment.app.FragmentPagerAdapter
 import id.android.soccerapp.R
 import id.android.soccerapp.ui.favourite.FavMatchFragment
 import id.android.soccerapp.ui.favourite.FavTeamFragment
 import java.util.*
 
-class FavViewPagerAdapter(private val mContext: Context?, fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
+class FavViewPagerAdapter(private val mContext: Context?, fm: FragmentManager) :
+    FragmentPagerAdapter(fm) {
     private val fragments = ArrayList<Fragment>()
 
     init {

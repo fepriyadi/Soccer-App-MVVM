@@ -2,68 +2,81 @@ package id.android.soccerapp.ui.detail
 
 import android.content.ContentValues
 import android.database.sqlite.SQLiteConstraintException
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.widget.Toolbar
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Section
+import com.xwray.groupie.ViewHolder
+import dagger.android.AndroidInjection
 import dagger.android.support.DaggerAppCompatActivity
 import id.android.soccerapp.R
 import id.android.soccerapp.data.db.FavoriteEvent
 import id.android.soccerapp.data.db.database
 import id.android.soccerapp.di.module.GlideApp
 import id.android.soccerapp.model.EventsItem
+import id.android.soccerapp.model.Lineup
 import id.android.soccerapp.ui.events.EventListViewModel
 import id.android.soccerapp.ui.events.states.*
 import id.android.soccerapp.ui.team.*
 import kotlinx.android.synthetic.main.activity_detail.*
+import kotlinx.android.synthetic.main.prev_match_fragment.*
+import kotlinx.android.synthetic.main.team_fragment.*
 import org.jetbrains.anko.db.classParser
 import org.jetbrains.anko.db.delete
 import org.jetbrains.anko.db.select
 import org.jetbrains.anko.toast
+import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 
-class DetailActivity : DaggerAppCompatActivity() {
+class DetailActivity : DaggerAppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-
+    private val groupAdapter = GroupAdapter<ViewHolder>()
     private lateinit var viewModelEvent: EventListViewModel
     private lateinit var viewModelTeam: TeamListViewModel
     private lateinit var eventItem: EventsItem
 
-    var Hometeam: String? = ""
-    var Awayteam: String? = ""
-    var idMatch: String = ""
+    private var Hometeam: String? = ""
+    private var Awayteam: String? = ""
+    private var idMatch: String = ""
     private var menuItem: Menu? = null
-    var isFavorite: Boolean = false
+    private var isFavorite: Boolean = false
 
     companion object {
-        val ID_MATCH = "id_match"
+        const val ID_MATCH = "id_match"
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
-//        AndroidInjection.inject(this)
+        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
 
-        val toolbar = findViewById<View>(R.id.toolbar) as Toolbar
+        val toolbar = findViewById<View>(R.id.toolbar) as androidx.appcompat.widget.Toolbar
         setSupportActionBar(toolbar)
+        loading_detail_activity.setOnRefreshListener(this)
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
         toolbar.setNavigationOnClickListener { onBackPressed() }
 
         idMatch = intent.getStringExtra(ID_MATCH)
 
-        viewModelEvent = ViewModelProvider(this, viewModelFactory).get(EventListViewModel::class.java)
+        viewModelEvent =
+            ViewModelProvider(this, viewModelFactory).get(EventListViewModel::class.java)
         viewModelTeam = ViewModelProvider(this, viewModelFactory).get(TeamListViewModel::class.java)
-
+        setupRv()
         checkDbIsFav()
         observerViewModel()
 
@@ -84,9 +97,11 @@ class DetailActivity : DaggerAppCompatActivity() {
 
     private fun setFavourite() {
         if (isFavorite)
-            menuItem?.getItem(0)?.icon = ContextCompat.getDrawable(this, R.drawable.ic_star_black_24dp)
+            menuItem?.getItem(0)?.icon =
+                ContextCompat.getDrawable(this, R.drawable.ic_star_black_24dp)
         else
-            menuItem?.getItem(0)?.icon = ContextCompat.getDrawable(this, R.drawable.ic_star_border_black_24dp)
+            menuItem?.getItem(0)?.icon =
+                ContextCompat.getDrawable(this, R.drawable.ic_star_border_black_24dp)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -116,8 +131,10 @@ class DetailActivity : DaggerAppCompatActivity() {
         if (isFavorite) {
             try {
                 this.database.use {
-                    delete(FavoriteEvent.TABLE_FAVORITE, "(${FavoriteEvent.EVENT_ID} = {id})",
-                            "id" to idMatch)
+                    delete(
+                        FavoriteEvent.TABLE_FAVORITE, "(${FavoriteEvent.EVENT_ID} = {id})",
+                        "id" to idMatch
+                    )
                     toast(getString(R.string.succes_deleting_record))
 
                 }
@@ -139,8 +156,10 @@ class DetailActivity : DaggerAppCompatActivity() {
     fun checkDbIsFav() {
         database.use {
             val result = select(FavoriteEvent.TABLE_FAVORITE)
-                    .whereArgs("(${FavoriteEvent.EVENT_ID} = {id})",
-                            "id" to idMatch)
+                .whereArgs(
+                    "(${FavoriteEvent.EVENT_ID} = {id})",
+                    "id" to idMatch
+                )
             val favorite = result.parseList(classParser<FavoriteEvent>())
             if (!favorite.isEmpty()) isFavorite = true
         }
@@ -152,61 +171,128 @@ class DetailActivity : DaggerAppCompatActivity() {
 
     // state observer
     private val stateObserverEvent = Observer<EventListState> { state ->
-        state?.let {
+        state?.let { it ->
             when (state) {
                 is DefaultState -> {
-//                    isLoading = false
-//                    loading.isRefreshing = false
-
+                    loading_detail_activity.isRefreshing = false
                     // add data to adapter
                     it.data.map {
                         Section().apply {
                             setValue(it)
+                            GlideApp.with(this@DetailActivity).load(it.strBanner)
+                                .into(img_small_banner)
                             eventItem = it
                         }
                     }
+                    val positionList: MutableList<String> = mutableListOf()
+                    val map = it.dataLineup.associateBy(
+                        { it.strPositionShort + it.strHome + it.idPlayer }, {
+                            Lineup(
+                                strPosition = it.strPosition,
+                                strPlayer = it.strPlayer,
+                                strHome = it.strHome,
+                                intSquadNumber = it.intSquadNumber,
+                                strFormation = it.strFormation
+                            )
+                        })
+
+                    map.forEach { (key, _) ->
+                        positionList.add(key)
+                    }
+
+                    val result = mutableMapOf<String, MutableList<Lineup>>()
+                    map.forEach { (key, value) ->
+                        for (pos in positionList) {
+                            if (key.contains(pos)) {
+                                if (result.containsKey(pos.substring(0, 1))) {
+                                    val old = result[pos.substring(0, 1)]?.add(value)
+                                    result.plus(pos.substring(0, 1) to old)
+                                } else {
+                                    result[pos.substring(0, 1)] = mutableListOf(value)
+                                }
+                                break
+                            }
+                        }
+                    }
+                    if (result.isNotEmpty()) groupAdapter.clear()
+
+                    result.forEach { (key, value) ->
+                        val lineup = Lineup()
+                        for (values in value) {
+                            if (values.strHome.equals("Yes")) {
+                                lineup.strPlayerHome =
+                                    if (lineup.strPlayerHome != null)
+                                        lineup.strPlayerHome + values.intSquadNumber + "   " + values.strPlayer + "\n"
+                                    else
+                                        values.intSquadNumber + "   " + values.strPlayer + "\n"
+                                home_team_formation.text = values.strFormation
+                            } else {
+                                lineup.strPlayerAway =
+                                    if (lineup.strPlayerAway != null)
+                                        lineup.strPlayerAway + values.strPlayer + "   " + values.intSquadNumber + "\n"
+                                    else
+                                        values.strPlayer + "   " + values.intSquadNumber + "\n"
+                                away_team_formation.text = values.strFormation
+                            }
+                            lineup.strPosition =
+                                when (key.substring(0, 1)) {
+                                    "G" -> "Goalkeeper"
+                                    "D" -> "Defender"
+                                    "M" -> "Midfielder"
+                                    "F" -> "Forward"
+                                    else -> ""
+                                }
+                        }
+                        groupAdapter.add(id.android.soccerapp.ui.events.rvitem.LineupItem(this@DetailActivity,
+                            lineup))
+                    }
                 }
                 is LoadingState -> {
-//                    Log.d(TAG, "loading state")
-//                    loading.isRefreshing = true
-//                    isLoading = true
+                    println("loading state")
+                    loading_detail_activity.isRefreshing = true
                 }
 
                 is ErrorState -> {
-                    Log.e("", "error state")
+                    loading_detail_activity.isRefreshing = false
+                    Timber.e("error")
                 }
-                is EmptyState -> TODO()
+                is EmptyState -> {
+                    loading_detail_activity.isRefreshing = false
+                    toast("No data found")
+                }
             }
         }
     }
 
-    private val stateObserverTeam = Observer<TeamListState> { state ->
+    private val stateObserverTeam = androidx.lifecycle.Observer<TeamListState> { state ->
         state?.let {
 
             when (state) {
                 is DefaultTeamState -> {
 //                    isLoading = false
-//                    loading.isRefreshing = false
+                    loading_detail_activity.isRefreshing = false
                     // add data to adapter
                     it.data.map {
                         Section().apply {
                             if (it.idTeam.equals(Hometeam)) {
-                                GlideApp.with(this@DetailActivity).load(it.strTeamBadge).into(img_home_team)
+                                GlideApp.with(this@DetailActivity).load(it.strTeamJersey)
+                                    .into(img_home_team)
                             } else
-                                GlideApp.with(this@DetailActivity).load(it.strTeamBadge).into(img_away_team)
-
+                                GlideApp.with(this@DetailActivity).load(it.strTeamJersey)
+                                    .into(img_away_team)
                         }
                     }
 
                 }
                 is LoadingTeamState -> {
 //                    Log.d(TAG, "loading state")
-//                    loading.isRefreshing = true
+                    loading_detail_activity.isRefreshing = true
 //                    isLoading = true
                 }
 
                 is ErrorTeamState -> {
-                    Log.e("", "error state")
+                    loading_detail_activity.isRefreshing = false
+                    Timber.e("error state")
                 }
             }
         }
@@ -222,29 +308,26 @@ class DetailActivity : DaggerAppCompatActivity() {
         viewModelEvent.stateLiveData.removeObserver(stateObserverEvent)
     }
 
-    fun setValue(event: EventsItem?) {
-        event_time_detail.text = event?.dateEvent
-        home_team_name.text = event?.strHomeTeam
-        home_score.text = event?.intHomeScore
-        home_team_formation.text = event?.strHomeFormation
-        home_team_goal.text = event?.strHomeGoalDetails
-        home_team_shot.text = event?.intHomeShots
-        gk_home_team.text = event?.strHomeLineupGoalkeeper
-        df_home_team.text = event?.strHomeLineupDefense
-        md_home_team.text = event?.strHomeLineupMidfield
-        fw_home_team.text = event?.strHomeLineupForward
-        sub_home_team.text = event?.strHomeLineupSubstitutes
+    private fun setupRv() {
+        rv_lineup.apply {
+            layoutManager = LinearLayoutManager(this@DetailActivity)
+            adapter = groupAdapter
+        }
+    }
 
-        away_team_name.text = event?.strAwayTeam
+    fun setValue(event: EventsItem?) {
+//        event_time_detail.text = event?.dateEvent
+//        home_team_name.text = event?.strHomeTeam
+        home_score.text = event?.intHomeScore
+//        home_team_formation.text = event?.strHomeFormation
+//        home_team_goal.text = event?.strHomeGoalDetails
+//        home_team_shot.text = event?.intHomeShots
+
+//        away_team_name.text = event?.strAwayTeam
         away_score.text = event?.intAwayScore
-        away_team_formation.text = event?.strAwayFormation
-        away_team_goal.text = event?.strAwayGoalDetails
-        away_team_shot.text = event?.intAwayShots
-        gk_away_team.text = event?.strAwayLineupGoalkeeper
-        df_away_team.text = event?.strAwayLineupDefense
-        md_away_team.text = event?.strAwayLineupMidfield
-        fw_away_team.text = event?.strAwayLineupForward
-        sub_away_team.text = event?.strAwayLineupSubstitutes
+//        away_team_formation.text = event?.strAwayFormation
+//        away_team_goal.text = event?.strAwayGoalDetails
+//        away_team_shot.text = event?.intAwayShots
 
         Hometeam = event?.idHomeTeam
         Awayteam = event?.idAwayTeam
@@ -252,4 +335,9 @@ class DetailActivity : DaggerAppCompatActivity() {
         getTeamInfo(event?.idHomeTeam)
         getTeamInfo(Awayteam)
     }
+
+    override fun onRefresh() {
+        viewModelEvent.updateEventDetail(idMatch)
+    }
+
 }

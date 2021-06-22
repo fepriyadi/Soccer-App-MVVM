@@ -21,8 +21,12 @@ class TeamItem(private val context: Context?, private val event: TeamsItem,
     override fun bind(viewHolder: ViewHolder, position: Int) {
         if (context != null) {
             GlideApp.with(context)
-                    .load(event.strTeamBadge)
-                    .into(viewHolder.itemView.team_logo)
+                .load(event.strTeamBadge)
+                .into(viewHolder.itemView.team_logo)
+
+            GlideApp.with(context)
+                .load(event.strTeamJersey)
+                .into(viewHolder.itemView.team_jersey)
         }
 
         viewHolder.itemView.tv_team_name.text = event.strTeam

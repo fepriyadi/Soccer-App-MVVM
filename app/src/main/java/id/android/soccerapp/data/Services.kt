@@ -1,9 +1,6 @@
 package id.android.soccerapp.data
 
-import id.android.soccerapp.model.EventsResponse
-import id.android.soccerapp.model.Leagues
-import id.android.soccerapp.model.Players
-import id.android.soccerapp.model.TeamDetail
+import id.android.soccerapp.model.*
 import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -28,12 +25,18 @@ interface Services {
     fun searchEvent(@Query("e") name: String?) : Single<EventsResponse>
 
     @GET("search_all_teams.php")
-    fun getAllTeamByLeague(@Query("l") name: String?) : Single<TeamDetail>
+    fun getAllTeamByLeague(@Query("l") name: String?): Single<TeamDetail>
 
     @GET("searchteams.php")
-    fun searchTeamByName(@Query("t") name: String?) : Single<TeamDetail>
+    fun searchTeamByName(@Query("t") name: String?): Single<TeamDetail>
 
     @GET("lookup_all_players.php")
-    fun getAllPlayerByTeamId(@Query("id") id: String?) : Single<Players>
+    fun getAllPlayerByTeamId(@Query("id") id: String?): Single<Players>
+
+    @GET("lookuplineup.php")
+    fun getLineupEvent(@Query("id") id: String?): Single<LineupResponse>
+
+    @GET("lookupeventstats.php")
+    fun getStatEvent(@Query("id") id: String?): Single<EventstatResponse>
 
 }

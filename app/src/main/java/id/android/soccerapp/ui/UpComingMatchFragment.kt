@@ -7,13 +7,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.snackbar.Snackbar
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Section
 import com.xwray.groupie.ViewHolder
@@ -29,8 +30,11 @@ import id.android.soccerapp.ui.events.rvitem.EventItemListener
 import id.android.soccerapp.ui.events.states.*
 import id.android.soccerapp.ui.home.ActiveFragmentListener
 import id.android.soccerapp.ui.home.ActiveTabListener
+import id.android.soccerapp.ui.home.MainActivity
+import kotlinx.android.synthetic.main.activity_search_event.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.upcoming_match_fragment.*
+import kotlinx.android.synthetic.main.upcoming_match_fragment.loading
 import javax.inject.Inject
 
 class UpComingMatchFragment : DaggerFragment(), EventItemListener, SwipeRefreshLayout.OnRefreshListener,
@@ -67,8 +71,14 @@ class UpComingMatchFragment : DaggerFragment(), EventItemListener, SwipeRefreshL
                 }
 
                 is ErrorState -> {
+                    isLoading = false
+                    loading.isRefreshing = false
                 }
-                is EmptyState -> TODO()
+                is EmptyState -> {
+                    isLoading = false
+                    loading.isRefreshing = false
+                    Snackbar.make(root, "No Data Found", Snackbar.LENGTH_INDEFINITE)
+                }
             }
         }
     }
@@ -78,7 +88,7 @@ class UpComingMatchFragment : DaggerFragment(), EventItemListener, SwipeRefreshL
                 is DefaultLeagueState -> {
                     isLoading = false
                     loading.isRefreshing = false
-                    setupSpinner(it.data)
+//                    setupSpinner(it.data.sortedBy { it.strLeague })
                 }
                 is LoadingLeagueState -> {
                     loading.isRefreshing = true
@@ -89,7 +99,11 @@ class UpComingMatchFragment : DaggerFragment(), EventItemListener, SwipeRefreshL
                     loading.isRefreshing = false
                     isLoading = false
                 }
-                is EmptyLeagueState -> TODO()
+                is EmptyLeagueState -> {
+                    loading.isRefreshing = false
+                    isLoading = false
+                    Toast.makeText(context, "No Data Found", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
@@ -98,20 +112,7 @@ class UpComingMatchFragment : DaggerFragment(), EventItemListener, SwipeRefreshL
         return this
     }
 
-    private fun setupSpinner(leagueList: List<LeaguesItem>) {
-        league_spinner.adapter = spinnerAdapter(leagueList)
-        league_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                val leagueItem = league_spinner.adapter.getItem(position) as LeaguesItem
-                viewModel.updateNextMatch(leagueItem.idLeague)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-
-            }
-        }
-    }
+//    }
 
     override fun onAddToCalenderClick(event: EventsItem?) {
 
@@ -121,31 +122,11 @@ class UpComingMatchFragment : DaggerFragment(), EventItemListener, SwipeRefreshL
 
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View? {
         return inflater.inflate(R.layout.upcoming_match_fragment, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewModel = ViewModelProvider(this, viewModelFactory).get(EventListViewModel::class.java)
-
-        setupRv()
-        loading.setOnRefreshListener(this)
-        observerViewModel()
-
-        val parentFrag = this@UpComingMatchFragment.parentFragment as MatchFragment
-        parentFrag.setActiveTab(this)
-
-        savedInstanceState?.let {
-            viewModel.restoreLeague()
-        } ?: viewModel.updateLeague()
-
-        val elevation = 0;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            activity?.toolbar?.elevation = elevation.toFloat()
-        }
     }
 
     override fun onAttach(context: Context) {
@@ -159,8 +140,43 @@ class UpComingMatchFragment : DaggerFragment(), EventItemListener, SwipeRefreshL
 
     private fun setupRv() {
         rv_upcoming_match.apply {
-            layoutManager = LinearLayoutManager(activity)
+            layoutManager = LinearLayoutManager(activity).apply { LinearLayoutManager.HORIZONTAL }
             adapter = groupAdapter
+        }
+    }
+
+    //    private fun setupSpinner(leagueList: List<LeaguesItem>) {
+//        league_spinner.adapter = spinnerAdapter(leagueList)
+//        league_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+//
+//            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+//                val leagueItem = league_spinner.adapter.getItem(position) as LeaguesItem
+//                viewModel.updateNextMatch(leagueItem.idLeague)
+//            }
+//
+//            override fun onNothingSelected(parent: AdapterView<*>) {
+//
+//            }
+//        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel = ViewModelProvider(this, viewModelFactory).get(EventListViewModel::class.java)
+
+        setupRv()
+        loading.setOnRefreshListener(this)
+        observerViewModel()
+
+        val parentFrag = this@UpComingMatchFragment.parentFragment as MatchFragment
+        parentFrag.setActiveTab(this)
+        (activity as MainActivity).supportActionBar?.title = "Upcoming Match"
+//        savedInstanceState?.let {
+//            viewModel.restoreLeague()
+//        } ?: viewModel.updateLeague()
+        viewModel.updateNextMatch("4502")
+        val elevation = 0
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            activity?.toolbar?.elevation = elevation.toFloat()
         }
     }
 
@@ -182,11 +198,11 @@ class UpComingMatchFragment : DaggerFragment(), EventItemListener, SwipeRefreshL
 
     override fun onRefresh() {
         groupAdapter.clear()
-        val selectedLeague = league_spinner?.selectedItem!! as LeaguesItem
-        if (league_spinner != null && league_spinner.selectedItem == null)
-            viewModel.updateLeague()
-        else
-            viewModel.refreshEventNextMatch(selectedLeague.idLeague)
+//        val selectedLeague = league_spinner?.selectedItem!! as LeaguesItem
+//        if (league_spinner != null && league_spinner.selectedItem == null)
+//            viewModel.updateLeague()
+//        else
+        viewModel.refreshEventNextMatch("4502")
     }
 
     private fun spinnerAdapter(leagues: List<LeaguesItem>): ArrayAdapter<LeaguesItem> {

@@ -80,6 +80,8 @@ class PlayerFragment : DaggerFragment(), PlayerItemListener, SwipeRefreshLayout.
                 }
 
                 is ErrorPlayerState -> {
+                    loading.isRefreshing = false
+                    isLoading = false
                     Log.e("", "error state")
                 }
             }

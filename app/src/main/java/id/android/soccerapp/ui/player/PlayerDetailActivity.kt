@@ -3,6 +3,7 @@ package id.android.soccerapp.ui.player
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
+import dagger.android.AndroidInjection
 import dagger.android.support.DaggerAppCompatActivity
 import id.android.soccerapp.R
 import id.android.soccerapp.di.module.GlideApp
@@ -17,6 +18,7 @@ class PlayerDetailActivity :DaggerAppCompatActivity() {
         val PLAYER = "PLAYER"
     }
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player_detail)
         val toolbar = findViewById<View>(R.id.toolbar) as Toolbar

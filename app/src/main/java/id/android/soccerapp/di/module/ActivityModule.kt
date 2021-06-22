@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.android.ContributesAndroidInjector
 import id.android.soccerapp.ui.detail.DetailActivity
 import id.android.soccerapp.ui.home.MainActivity
+import id.android.soccerapp.ui.player.PlayerDetailActivity
 import id.android.soccerapp.ui.search.SearchEventActivity
 import id.android.soccerapp.ui.teamDetail.TeamDetailActivity
 
@@ -27,4 +28,7 @@ abstract class ActivityModule {
 
     @ContributesAndroidInjector
     abstract fun contributeTeamDetailActivity(): TeamDetailActivity
+
+    @ContributesAndroidInjector
+    abstract fun contributePlayerDetailActivity(): PlayerDetailActivity
 }

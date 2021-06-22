@@ -10,7 +10,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-private val TAG = TeamListViewModel::class.java.name
+val TAG = TeamListViewModel::class.java.name
 
 class TeamListViewModel @Inject constructor(private val repo: TeamRepository) : ViewModel() {
 

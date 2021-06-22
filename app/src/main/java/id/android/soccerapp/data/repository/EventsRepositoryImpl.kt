@@ -5,7 +5,9 @@ import id.android.soccerapp.data.Services
 import id.android.soccerapp.data.db.FavoriteEvent
 import id.android.soccerapp.data.db.database
 import id.android.soccerapp.model.EventsItem
+import id.android.soccerapp.model.EventstatsItem
 import id.android.soccerapp.model.LeaguesItem
+import id.android.soccerapp.model.LineupItem
 import id.android.soccerapp.utils.isNetworkStatusAvailable
 import io.reactivex.Single
 import org.jetbrains.anko.db.classParser
@@ -81,13 +83,41 @@ class EventsRepositoryImpl(private val service: Services,
     override fun getPrevMatch(id: String?): Single<List<EventsItem>> {
         return if (context.isNetworkStatusAvailable()) {
             service.getFiveteenLastEvents(id)
-                    .flattenAsObservable {
-                        it.events
-                    }
-                    .map {
-                        val event = it
-                        event
-                    }.toList()
+                .flattenAsObservable {
+                    it.events
+                }
+                .map {
+                    val event = it
+                    event
+                }.toList()
+        } else
+            Single.error(Throwable())
+    }
+
+    override fun getEventLineup(id: String?): Single<List<LineupItem>> {
+        return if (context.isNetworkStatusAvailable()) {
+            service.getLineupEvent(id)
+                .flattenAsObservable {
+                    it.lineup
+                }
+                .map {
+                    val event = it
+                    event
+                }.toList()
+        } else
+            Single.error(Throwable())
+    }
+
+    override fun getEventStat(id: String?): Single<List<EventstatsItem>> {
+        return if (context.isNetworkStatusAvailable()) {
+            service.getStatEvent(id)
+                .flattenAsObservable {
+                    it.eventstats
+                }
+                .map {
+                    val event = it
+                    event
+                }.toList()
         } else
             Single.error(Throwable())
     }

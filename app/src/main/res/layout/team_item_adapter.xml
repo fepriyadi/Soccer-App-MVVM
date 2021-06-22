@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/team_item"
+    android:background="?android:attr/selectableItemBackground"
     android:layout_width="match_parent"
     android:orientation="horizontal"
     android:padding="@dimen/activity_horizontal_margin"
@@ -8,13 +9,21 @@
 
     <ImageView
         android:id="@+id/team_logo"
+        android:layout_alignParentStart="true"
         android:layout_width="50dip"
         android:layout_height="50dip" />
 
     <TextView
         android:id="@+id/tv_team_name"
+        android:layout_toEndOf="@id/team_logo"
         android:layout_margin="15dip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-</LinearLayout>
+    <ImageView
+        android:id="@+id/team_jersey"
+        android:layout_width="50dip"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>

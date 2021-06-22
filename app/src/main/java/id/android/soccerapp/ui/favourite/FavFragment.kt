@@ -9,31 +9,32 @@ import dagger.android.support.AndroidSupportInjection
 import dagger.android.support.DaggerFragment
 import id.android.soccerapp.R
 import id.android.soccerapp.ui.adapter.FavViewPagerAdapter
-import id.android.soccerapp.ui.home.MainActivity
 import kotlinx.android.synthetic.main.fav_fragment.*
-import kotlinx.android.synthetic.main.toolbar.*
 
 /**
  * Created by developer on 9/24/18.
  */
 class FavFragment : DaggerFragment() {
     private lateinit var favViewPagerAdapter: FavViewPagerAdapter
+
     companion object {
         fun newInstance() = FavFragment()
     }
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View? {
         return inflater.inflate(R.layout.fav_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as MainActivity).setSupportActionBar(toolbar)
+//        (activity as MainActivity).setSupportActionBar(toolbar)
 
         favViewPagerAdapter = FavViewPagerAdapter(context, childFragmentManager)
         view_pager.adapter = favViewPagerAdapter
-
-        tabs.setupWithViewPager(view_pager);
+        tabs.setupWithViewPager(view_pager)
 
     }
 

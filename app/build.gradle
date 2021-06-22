@@ -18,7 +18,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 //        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        buildConfigField "String", "BASE_URL", "\"https://www.thesportsdb.com/api/v1/json/1/\""
+        buildConfigField "String", "BASE_URL", "\"https://www.thesportsdb.com/api/v1/json/40130162/\""
         multiDexEnabled true
     }
 

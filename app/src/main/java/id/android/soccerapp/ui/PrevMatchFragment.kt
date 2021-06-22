@@ -1,5 +1,6 @@
 package id.android.soccerapp.ui
 
+//import kotlinx.android.synthetic.main.prev_match_fragment.league_spinner
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -7,13 +8,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.snackbar.Snackbar
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Section
 import com.xwray.groupie.ViewHolder
@@ -29,9 +30,14 @@ import id.android.soccerapp.ui.events.rvitem.EventItemListener
 import id.android.soccerapp.ui.events.states.*
 import id.android.soccerapp.ui.home.ActiveFragmentListener
 import id.android.soccerapp.ui.home.ActiveTabListener
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_search_event.*
 import kotlinx.android.synthetic.main.prev_match_fragment.*
+import kotlinx.android.synthetic.main.prev_match_fragment.loading
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.android.synthetic.main.upcoming_match_fragment.*
 import timber.log.Timber.*
+import java.util.*
 import javax.inject.Inject
 
 class PrevMatchFragment : DaggerFragment(), EventItemListener, SwipeRefreshLayout.OnRefreshListener,
@@ -45,7 +51,7 @@ class PrevMatchFragment : DaggerFragment(), EventItemListener, SwipeRefreshLayou
 
     private val groupAdapter = GroupAdapter<ViewHolder>()
 
-    private var isLoading = false
+//    private var isLoading = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -61,22 +67,22 @@ class PrevMatchFragment : DaggerFragment(), EventItemListener, SwipeRefreshLayou
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(EventListViewModel::class.java)
-
         setupRv()
         loading.setOnRefreshListener(this)
         observerViewModel()
         val parentFrag = this@PrevMatchFragment.parentFragment as MatchFragment
         parentFrag.setActiveTab(this)
 
-        val elevation = 0;
+        (this.parentFragment as MatchFragment).activity?.title = "Lastest Match"
+        val elevation = 0
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             activity?.toolbar?.elevation = elevation.toFloat()
         }
 
-        savedInstanceState?.let {
-            viewModel.restoreLeague()
-        } ?: viewModel.updateLeague()
-
+//        savedInstanceState?.let {
+//            viewModel.restoreLeague()
+//        } ?: viewModel.updateLeague()
+        viewModel.updatePrevMatch("4502")
     }
     override fun getFragment(): Fragment {
         return this
@@ -95,7 +101,7 @@ class PrevMatchFragment : DaggerFragment(), EventItemListener, SwipeRefreshLayou
             when (state) {
                 is DefaultState -> {
 
-                    isLoading = false
+//                    isLoading = false
                     loading.isRefreshing = false
 
                     groupAdapter.clear()
@@ -110,15 +116,18 @@ class PrevMatchFragment : DaggerFragment(), EventItemListener, SwipeRefreshLayou
                 is LoadingState -> {
 //                    Log.d(TAG, "loading state")
                     loading.isRefreshing = true
-                    isLoading = true
+//                    isLoading = true
                 }
 
                 is ErrorState -> {
                     loading.isRefreshing = false
-                    isLoading = false
+//                    isLoading = false
 
                 }
                 is EmptyState -> {
+//                    isLoading = false
+                    loading.isRefreshing = false
+                    Snackbar.make(root, "No Data Found", Snackbar.LENGTH_INDEFINITE)
                 }
 
             }
@@ -131,39 +140,43 @@ class PrevMatchFragment : DaggerFragment(), EventItemListener, SwipeRefreshLayou
     }
 
     private val stateObserverLeague = Observer<LeagueListState> { state ->
-        state?.let {
+        state?.let { it ->
             when (state) {
                 is DefaultLeagueState -> {
-                    isLoading = false
+//                    isLoading = false
                     loading.isRefreshing = false
-                    setupSpinner(it.data)
+                    setupSpinner(it.data.sortedBy { it.strLeague })
                 }
                 is LoadingLeagueState -> {
                     loading.isRefreshing = true
-                    isLoading = true
+//                    isLoading = true
                 }
 
                 is ErrorLeagueState -> {
                     loading.isRefreshing = false
-                    isLoading = false
+//                    isLoading = false
                 }
-                is EmptyLeagueState -> TODO()
+                is EmptyLeagueState -> {
+                    loading.isRefreshing = false
+//                    isLoading = false
+                    Snackbar.make(root, "No Data Found", Snackbar.LENGTH_INDEFINITE)
+                }
             }
         }
     }
     private fun setupSpinner(leagueList: List<LeaguesItem>) {
-        league_spinner.adapter = spinnerAdapter(leagueList)
-        league_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                val leagueItem = league_spinner.adapter.getItem(position) as LeaguesItem
-                viewModel.updatePrevMatch(leagueItem.idLeague)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-
-            }
-        }
+//        league_spinner.adapter = spinnerAdapter(leagueList)
+//        league_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+//
+//            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+//                val leagueItem = league_spinner.adapter.getItem(position) as LeaguesItem
+//                viewModel.updatePrevMatch(leagueItem.idLeague)
+//            }
+//
+//            override fun onNothingSelected(parent: AdapterView<*>) {
+//
+//            }
+//        }
     }
 
     private fun setupRv() {
@@ -192,11 +205,11 @@ class PrevMatchFragment : DaggerFragment(), EventItemListener, SwipeRefreshLayou
 
     override fun onRefresh() {
         groupAdapter.clear()
-        val selectedLeague = league_spinner?.selectedItem!! as LeaguesItem
-        if (league_spinner.selectedItem == null)
-            viewModel.updateLeague()
-        else
-            viewModel.refreshEventPrevMatch(selectedLeague.idLeague)
+//        val selectedLeague = league_spinner?.selectedItem!! as LeaguesItem
+//        if (league_spinner.selectedItem == null)
+//            viewModel.updateLeague()
+//        else
+        viewModel.refreshEventPrevMatch("4502")
     }
 
     private fun spinnerAdapter(leagues: List<LeaguesItem>): ArrayAdapter<LeaguesItem> {

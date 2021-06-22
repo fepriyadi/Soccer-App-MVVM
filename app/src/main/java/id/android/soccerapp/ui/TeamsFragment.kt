@@ -2,14 +2,12 @@ package id.android.soccerapp.ui
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
@@ -28,11 +26,11 @@ import id.android.soccerapp.ui.events.EventListViewModel
 import id.android.soccerapp.ui.events.rvitem.TeamItem
 import id.android.soccerapp.ui.events.rvitem.TeamItemListener
 import id.android.soccerapp.ui.events.states.*
-import kotlinx.android.synthetic.main.team_fragment.*
-import kotlinx.android.synthetic.main.toolbar.*
 import id.android.soccerapp.ui.home.MainActivity
 import id.android.soccerapp.ui.team.*
 import id.android.soccerapp.ui.teamDetail.TeamDetailActivity
+import kotlinx.android.synthetic.main.team_fragment.*
+import kotlinx.android.synthetic.main.toolbar.*
 import javax.inject.Inject
 
 class TeamsFragment : DaggerFragment(), TeamItemListener, SearchView.OnQueryTextListener, SearchView.OnCloseListener, SwipeRefreshLayout.OnRefreshListener {
@@ -47,13 +45,22 @@ class TeamsFragment : DaggerFragment(), TeamItemListener, SearchView.OnQueryText
     private val groupAdapter = GroupAdapter<ViewHolder>()
     private var isLoading = false
     private var query: String? = ""
+    private val ARG_NAME = "arg_name"
 
     companion object {
-        fun newInstance() = TeamsFragment()
+        fun newInstance(id: String): TeamsFragment {
+            val bundle = Bundle()
+            bundle.putString(TeamsFragment().ARG_NAME, id)
+            val homeFragment = TeamsFragment()
+            homeFragment.arguments = bundle
+            return homeFragment
+        }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View? {
         return inflater.inflate(R.layout.team_fragment, container, false)
     }
 
@@ -64,25 +71,28 @@ class TeamsFragment : DaggerFragment(), TeamItemListener, SearchView.OnQueryText
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as MainActivity).setSupportActionBar(toolbar)
-        (activity as MainActivity).supportActionBar?.title = "List Team"
+//        (activity as MainActivity).setSupportActionBar(toolbar)
+        val toolbar = (activity as MainActivity).supportActionBar
+        toolbar?.apply {
+            title = "Football"
+            elevation = 3F
+        }
+
+
         viewModelTeam = ViewModelProvider(this, viewModelFactory).get(TeamListViewModel::class.java)
         viewModel = ViewModelProvider(this, viewModelFactory).get(EventListViewModel::class.java)
         setupRv()
         loading.setOnRefreshListener(this)
         observerViewModel()
+//        search_toolbar.visibility = View.VISIBLE
+//        search_toolbar.setOnQueryTextListener(this)
+//        search_toolbar.setOnCloseListener(this)
 
-        val elevation = 5;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            activity?.toolbar?.elevation = elevation.toFloat()
-        }
-        search_toolbar.visibility = View.VISIBLE
-        search_toolbar.setOnQueryTextListener(this)
-        search_toolbar.setOnCloseListener(this)
+//        savedInstanceState?.let {
+//            viewModel.restoreLeague()
+//        } ?: viewModel.updateLeague()
 
-        savedInstanceState?.let {
-            viewModel.restoreLeague()
-        } ?: viewModel.updateLeague()
+        viewModelTeam.refreshTeamList("UEFA European Championships")
 
     }
 
@@ -99,8 +109,8 @@ class TeamsFragment : DaggerFragment(), TeamItemListener, SearchView.OnQueryText
 
     override fun onClose(): Boolean {
         this.query = ""
-        val selectedLeague = league_spinner.selectedItem as LeaguesItem
-        viewModelTeam.refreshTeamList(selectedLeague.strLeague)
+//        val selectedLeague = league_spinner.selectedItem as LeaguesItem
+        viewModelTeam.refreshTeamList("UEFA European Championships")
         return false
     }
 
@@ -149,7 +159,7 @@ class TeamsFragment : DaggerFragment(), TeamItemListener, SearchView.OnQueryText
                 is DefaultLeagueState -> {
                     isLoading = false
                     loading.isRefreshing = false
-                    setupSpinner(it.data)
+//                    setupSpinner(it.data)
                 }
                 is LoadingLeagueState -> {
                     loading.isRefreshing = true
@@ -165,20 +175,20 @@ class TeamsFragment : DaggerFragment(), TeamItemListener, SearchView.OnQueryText
         }
     }
 
-    private fun setupSpinner(leagueList: List<LeaguesItem>) {
-        league_spinner.adapter = spinnerAdapter(leagueList)
-        league_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                val leagueItem = league_spinner.adapter.getItem(position) as LeaguesItem
-                viewModelTeam.refreshTeamList(leagueItem.strLeague)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-
-            }
-        }
-    }
+//    private fun setupSpinner(leagueList: List<LeaguesItem>) {
+//        league_spinner.adapter = spinnerAdapter(leagueList)
+//        league_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+//
+//            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+//                val leagueItem = league_spinner.adapter.getItem(position) as LeaguesItem
+//                viewModelTeam.refreshTeamList(leagueItem.strLeague)
+//            }
+//
+//            override fun onNothingSelected(parent: AdapterView<*>) {
+//
+//            }
+//        }
+//    }
 
     private fun setupRv() {
         rv_teams.apply {
@@ -199,16 +209,16 @@ class TeamsFragment : DaggerFragment(), TeamItemListener, SearchView.OnQueryText
     }
 
     override fun onRefresh() {
-        val selectedLeague = league_spinner?.selectedItem!! as LeaguesItem
+//        val selectedLeague = league_spinner?.selectedItem!! as LeaguesItem
         groupAdapter.clear()
 
         if (!TextUtils.isEmpty(query)) {
             viewModelTeam.refreshTeam(query)
         } else {
-            if (league_spinner.selectedItem == null)
-                viewModel.updateLeague()
-            else
-                viewModelTeam.refreshTeamList(selectedLeague.strLeague)
+//            if (league_spinner.selectedItem == null)
+//                viewModel.updateLeague()
+//            else
+            viewModelTeam.refreshTeamList("UEFA European Championships")
 
         }
     }
